@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="orthos.fyzicke_zatazenie.PODROBNOSTI_TRENING"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="DATUM TRENINGU"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/DATUM_TRENINGU"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="DATUM TRENINGU"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="VZDIALENOST"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/VZDIALENOST"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="VZDIALENOST"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="DLZKA TRENINGU"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/DLZKA_TRENINGU"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="DLZKA_TRENINGU"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="PREIEMERNY TEP"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/PRIEMERNY_TEP"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="PRIEMERNY_TEP"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="PRIEMERNA RYCHLOST"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/PRIEMERNA_RYCHLOST"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="PRIEMERNA_RYCHLOST"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="KCAL"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/KCAL"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="KCAL"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="CAS TRENINGU"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/CAS_TRENINGU"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="CAS_TRENINGU"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="40dp"
+        android:layout_marginBottom="0dp"/>
+
+    <Button
+        android:id="@+id/ZMAZAT"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:text="ZMAZAT TRENING"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:onClick="ZMAZAT_TRENING"/>
+
+
+
+</LinearLayout>
