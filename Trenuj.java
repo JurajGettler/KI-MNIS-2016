@@ -1,6 +1,20 @@
 package orthos.fyzicke_zatazenie;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,19 +24,24 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.graphics.Color;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.google.ads.mediation.customevent.CustomEventAdapter;
 
@@ -40,18 +59,41 @@ public class Trenuj extends AppCompatActivity{
     public String datum = "";
     public int vzdialenost;
     public String cas = "";
-    public int avg_tep;
+    public int avg_tep = 0;
     public int aktualna_rychlost,cas_rychlost;
     public int priemerna_rychlost;
     public int kcal;
     public String hodiny;
     public String TRENING;
     public double aktualna_vzdialenost;
+  //MERANIE TEPU
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeScanner mBluetoothLeScanner;
+    private String s;
+    Handler sHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            s =  msg.obj.toString();
+            tep.setText(s);
+            int t = Integer.parseInt(s);
+            pocitadlo++;
+            avg_tep = avg_tep + t;
+        }
+    };
+    int BR = 1;
+    int sk ;
+    private ListView list_device;
+    private ArrayAdapter<String> adapter;
+    private BluetoothDevice zariadenie;
+    private BluetoothGatt mBluetoothGatt;
+    private BluetoothGatt mGatt;
+    private int pocitadlo = 0;
+    private LinearLayout tep_layout;
 
 
     DatabaseHelper myDb;
-    Button butnstart, butnstop;
-    TextView time,trenuj_vzdialenost,trenuj_rychlost;
+    Button butnstart, butnstop,skenuj;
+    TextView time,trenuj_vzdialenost,trenuj_rychlost,tep;
     long starttime = 0L;
     long timeInTenthseconds = 0L;
     long timeSwapBuff = 0L;
@@ -97,12 +139,16 @@ public class Trenuj extends AppCompatActivity{
         dnes = Calendar.getInstance();
         format_hodiny = new SimpleDateFormat("HH:mm");
         format_den = new SimpleDateFormat("dd.MM.yyyy");
+        skenuj = (Button) findViewById(R.id.skenuj);
         butnstart = (Button) findViewById(R.id.start);
         butnstop = (Button) findViewById(R.id.stop);
         time = (TextView) findViewById(R.id.timer);
         trenuj_vzdialenost = (TextView) findViewById(R.id.trenuj_vzdialenost);
         trenuj_rychlost = (TextView) findViewById(R.id.trenuj_rychlost);
+        tep = (TextView) findViewById(R.id.trenuj_tep);
         vypocet = new Vypocet_vzdialenosti(myDb);
+        list_device = (ListView) findViewById(R.id.list_device);
+        tep_layout = (LinearLayout) findViewById(R.id.tep_layout);
 
 
      //VYBER SPORTU
@@ -126,6 +172,17 @@ public class Trenuj extends AppCompatActivity{
         }
          }
         );
+
+        //MERANIE TEPU
+
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        sk = 0;
+
+
+
+
+
 
         //GPS SLEDOVANIE
         //GPS SLEDOVANIE
@@ -200,6 +257,7 @@ public class Trenuj extends AppCompatActivity{
                     starttime = SystemClock.uptimeMillis();
                     handler.postDelayed(updateTimer, 0);
                     t = 0;
+                    sport.setVisibility(View.INVISIBLE);
                 } else {
                     butnstart.setText("Start");
                     time.setTextColor(Color.BLUE);
@@ -248,6 +306,7 @@ public class Trenuj extends AppCompatActivity{
 
            priemerna_rychlost = Priemerna_rychlost_zapis();
            vzdialenost = Vzdialenost_zapis();
+           avg_tep = avg_tep/pocitadlo;
            myDb.ubdateData(TRENING,datum, vzdialenost, cas, avg_tep, priemerna_rychlost, kcal, hodiny,vybraty_sport);
 
            StopGPS();
@@ -265,6 +324,9 @@ public class Trenuj extends AppCompatActivity{
 
             }
         });
+
+
+
 
     }
 
@@ -366,6 +428,187 @@ public class Trenuj extends AppCompatActivity{
         return (int) Math.round(vypocet.getDistanceHistoria(TRENING));
 
     }
+
+ //MERANIE TEPU
+
+    public void SKEN (View view){
+
+
+
+        if (sk==0){
+            skenuj.setText("SKENUJ");
+            sk = 1;
+            if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent,BR);
+
+            }
+            return;
+        }
+
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {}
+        else {
+
+
+            if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                Toast.makeText(Trenuj.this, "JE NAM LUTO, ALE VASE ZARIADENIE NEMA PODPORU BLUETOOTH SMART", Toast.LENGTH_LONG).show();
+
+            } else {
+
+                final BluetoothManager manager =
+                        (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+                mBluetoothAdapter = manager.getAdapter();
+                mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+                startScan();
+
+
+
+            }
+        }
+
+    }
+
+    private void startScan(){
+
+        ScanFilter beaconFilter = new ScanFilter.Builder().build();
+
+        ArrayList<ScanFilter> filters = new ArrayList<ScanFilter>();
+        filters.add(beaconFilter);
+
+        ScanSettings settings = new ScanSettings.Builder().build();
+
+        mBluetoothLeScanner.startScan(filters, settings, mScanCallback);
+
+
+    }
+
+    private void CreteListView(final String[] device){
+
+
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, device);
+        list_device.setAdapter(adapter);
+        list_device.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                mBluetoothLeScanner.stopScan(mScanCallback);
+
+                mBluetoothGatt = zariadenie.connectGatt(Trenuj.this, true, mGattCallback);
+
+                tep_layout.setVisibility(View.INVISIBLE);
+
+
+
+
+
+            }
+        });
+
+    }
+
+    private ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+            String[] device = new String [1];
+            device [0] = result.getDevice().getAddress();
+            CreteListView(device);
+            zariadenie = result.getDevice();
+
+
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            super.onBatchScanResults(results);
+            String[] device = new String[results.size()];
+            for (int i = 0;i<results.size();i++){
+                device[i] = results.get(i).getDevice().getAddress();
+            }
+            CreteListView(device);
+            zariadenie = results.get(0).getDevice();
+
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            super.onScanFailed(errorCode);
+            Toast.makeText(Trenuj.this, "SKENOVANIE ZLYHALO", Toast.LENGTH_LONG).show();
+
+        }
+    };
+
+    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            super.onCharacteristicChanged(gatt, characteristic);
+
+
+            int t = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8,1);
+            String te =Integer.toString(t);
+            Log.i("TEP", te);
+            Message msg = Message.obtain();
+            msg.obj = te;
+            sHandler.sendMessage(msg);
+
+
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            super.onCharacteristicRead(gatt, characteristic, status);
+            /**  byte[] value=characteristic.getValue();
+             String v = new String(value);
+             setText(v);
+             **/
+
+        }
+
+        @Override
+        public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorRead(gatt, descriptor, status);
+
+        }
+
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+
+
+            switch (newState) {
+                case BluetoothProfile.STATE_CONNECTED:
+                    gatt.discoverServices();
+                    break;
+
+            }
+
+        }
+
+
+
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            super.onServicesDiscovered(gatt, status);
+
+            mGatt = gatt;
+            List<BluetoothGattService> services = gatt.getServices();
+            Log.i("SLUZBY", services.get(2).getCharacteristics().get(0).getUuid().toString());
+            BluetoothGattCharacteristic therm_char = services.get(2).getCharacteristics().get(0);
+
+            for (BluetoothGattDescriptor descriptor : therm_char.getDescriptors()) {
+                descriptor.setValue( BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                mGatt.writeDescriptor(descriptor);
+            }
+
+            //gatt.readCharacteristic(therm_char);
+            gatt.setCharacteristicNotification(therm_char, true);
+
+
+
+        }
+    };
 
 
 }
