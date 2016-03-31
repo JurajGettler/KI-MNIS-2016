@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="53dp"
     android:background="@drawable/blue_trening"
     android:layout_marginTop="10dp">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:text="0"
+        android:textSize="40sp"
+        android:id="@+id/pocet_treningov"
+        android:gravity="center"
+        android:layout_marginLeft="25dp"/>
+
+    <LinearLayout
+        android:layout_marginLeft="5dp"
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="@color/common_google_signin_btn_text_dark_disabled"></LinearLayout>
+
+    <TextView
         android:id="@+id/hlavicka"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="DATUM"
-        android:textSize="50dp"
+        android:textSize="40sp"
         android:gravity="center_vertical"
         android:layout_marginLeft="20dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:text="0 kcal"
+        android:textSize="25sp"
+        android:id="@+id/spalene_kcal"
+        android:gravity="center"/>
+
 
 </LinearLayout>

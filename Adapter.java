@@ -36,6 +36,7 @@ public class Adapter extends BaseExpandableListAdapter {
         return prd.getString(1);
     }
 
+
     @Override
     public int getGroupCount() {
         return myDb.getDatum().getCount();
@@ -96,6 +97,20 @@ public class Adapter extends BaseExpandableListAdapter {
         return  prd.getString(8);
     }
 
+    public String spaleneKcal (int groupPosition){
+        Cursor prd =  myDb.getPotomokData(mojaHlavicka(groupPosition));
+        String s;
+        int c = 0;
+        while (prd.moveToNext()){
+          c = c + prd.getInt(6);
+
+        }
+        s = Integer.toString(c);
+        return s;
+
+    }
+
+
 
 
     @Override
@@ -117,6 +132,8 @@ public class Adapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 
         String title = (String) this.getGroup(groupPosition);
+        String pocet_treningov = Integer.toString(this.getChildrenCount(groupPosition));
+        String spalene_Kcal = this.spaleneKcal(groupPosition) + " Kcal";
 
         if(convertView == null){
             LayoutInflater layoutInflater =(LayoutInflater) this.ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -126,6 +143,14 @@ public class Adapter extends BaseExpandableListAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.hlavicka);
         textView.setTypeface(null, Typeface.BOLD);
         textView.setText(title);
+
+        TextView textViewPocet = (TextView) convertView.findViewById(R.id.pocet_treningov);
+        textViewPocet.setTypeface(null, Typeface.BOLD);
+        textViewPocet.setText(pocet_treningov);
+
+        TextView textViewKcal = (TextView) convertView.findViewById(R.id.spalene_kcal);
+        textViewKcal.setTypeface(null, Typeface.BOLD);
+        textViewKcal.setText(spalene_Kcal);
 
 
 
