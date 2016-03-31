@@ -18,6 +18,7 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -62,11 +63,13 @@ public class Trenuj extends AppCompatActivity{
     public int avg_tep = 0;
     public int aktualna_rychlost,cas_rychlost;
     public int priemerna_rychlost;
-    public int kcal;
+    public String kcal;
     public String hodiny;
     public String TRENING;
     public double aktualna_vzdialenost;
+    public String pohlavie;
   //MERANIE TEPU
+    public boolean BluetoothOn = false;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private String s;
@@ -87,7 +90,7 @@ public class Trenuj extends AppCompatActivity{
     private BluetoothDevice zariadenie;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGatt mGatt;
-    private int pocitadlo = 0;
+    private int pocitadlo = 1;
     private LinearLayout tep_layout;
 
 
@@ -125,17 +128,36 @@ public class Trenuj extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trenuj);
+        myDb = new DatabaseHelper(Trenuj.this);
+
+  //KONTROLA UDAJOV POUZIVATELA
+        Cursor user = myDb.getAllDataUSER();
+        if (user.moveToFirst()) {
+            int vaha = user.getInt(3);
+            int max_tep = user.getInt(4);
+            int vek = user.getInt(1);
+            pohlavie = user.getString(2);
+            if (vaha < 30 || max_tep < 60 || vek < 5 ) {
+                Intent intent = new Intent("NastaveniaN");
+                startActivity(intent);
+
+                Toast.makeText(Trenuj.this, "PROSIM NASTAVTE SVOJE OSOBNE UDAJE", Toast.LENGTH_LONG).show();
+            }
+        }else{Intent intent = new Intent("NastaveniaN");
+            startActivity(intent);
+
+            Toast.makeText(Trenuj.this, "PROSIM NASTAVTE SVOJE OSOBNE UDAJE", Toast.LENGTH_LONG).show();}
 
         vzdialenost = 0;
         avg_tep = 0;
         aktualna_rychlost = 0;
-        kcal = 0;
+        kcal = "0";
         aktualna_vzdialenost = 0;
         priemerna_rychlost = 0;
         cas_rychlost = 1;
         ZAPISUJ_INDIKATOR = 0;
 
-        myDb = new DatabaseHelper(Trenuj.this);
+
         dnes = Calendar.getInstance();
         format_hodiny = new SimpleDateFormat("HH:mm");
         format_den = new SimpleDateFormat("dd.MM.yyyy");
@@ -258,6 +280,7 @@ public class Trenuj extends AppCompatActivity{
                     handler.postDelayed(updateTimer, 0);
                     t = 0;
                     sport.setVisibility(View.INVISIBLE);
+                    tep_layout.setVisibility(View.INVISIBLE);
                 } else {
                     butnstart.setText("Start");
                     time.setTextColor(Color.BLUE);
@@ -270,7 +293,7 @@ public class Trenuj extends AppCompatActivity{
 
             if (ZAPISUJ_INDIKATOR == 0) {
 
-                myDb.insertData("",0,"",0,0,0,"",0);
+                myDb.insertData("",0,"",0,0,"","",0);
                 TRENING = myDb.getID();
                 ZAPISUJ_INDIKATOR = 1;
                 hodiny = format_hodiny.format(dnes.getTime());
@@ -307,9 +330,17 @@ public class Trenuj extends AppCompatActivity{
            priemerna_rychlost = Priemerna_rychlost_zapis();
            vzdialenost = Vzdialenost_zapis();
            avg_tep = avg_tep/pocitadlo;
+           if (pohlavie.equals("MUZSKE")) {
+               kcal = kcalMuz();
+               Toast.makeText(Trenuj.this,"MUZ",Toast.LENGTH_LONG).show();
+           }else {
+               kcal = kcalZena();
+               Toast.makeText(Trenuj.this,"ZENA",Toast.LENGTH_LONG).show();
+           }
            myDb.ubdateData(TRENING,datum, vzdialenost, cas, avg_tep, priemerna_rychlost, kcal, hodiny,vybraty_sport);
 
            StopGPS();
+           stopBluetooth();
            ZAPISUJ_INDIKATOR = 0;
 
            // ZOBRAZI DETAILI TRENINGU
@@ -319,6 +350,11 @@ public class Trenuj extends AppCompatActivity{
            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
            intent.putExtra("id", myDb.getMaxID());
            startActivity(intent);
+
+
+
+
+
 
        }
 
@@ -495,6 +531,8 @@ public class Trenuj extends AppCompatActivity{
 
                 mBluetoothGatt = zariadenie.connectGatt(Trenuj.this, true, mGattCallback);
 
+                BluetoothOn = true;
+
                 tep_layout.setVisibility(View.INVISIBLE);
 
 
@@ -609,6 +647,56 @@ public class Trenuj extends AppCompatActivity{
 
         }
     };
+
+ //VYPOCET KCAL
+
+    public String kcalMuz(){
+
+        Cursor user = myDb.getAllDataUSER();
+        int vaha;
+        int vek;
+        String muz_vysledok = "0";
+        if (user.moveToFirst()) {
+            vaha = user.getInt(3);
+            vek = user.getInt(1);
+
+
+            int vysledok = Math.round((((-55.0969f) + (0.6309f * avg_tep) + (0.1988f * vaha) +
+                    (0.2017f * vek)) / 4.184f) * (cas_rychlost / 60));
+            muz_vysledok = Integer.toString(vysledok);
+        }
+        return muz_vysledok;
+
+
+    }
+
+    public String kcalZena(){
+
+        Cursor user = myDb.getAllDataUSER();
+        int vaha;
+        int vek;
+        String zena_vysledok = "0";
+        if (user.moveToFirst()) {
+            vaha = user.getInt(3);
+            vek = user.getInt(1);
+
+
+            int vysledok = Math.round((((-20.4022f) + (0.4472f * avg_tep) + (0.1263f * vaha) +
+                    (0.074f * vek)) / 4.184f) * (cas_rychlost / 60));
+            zena_vysledok = Integer.toString(vysledok);
+        }
+        return zena_vysledok;
+
+    }
+
+    public void stopBluetooth(){
+        if(BluetoothOn){
+
+            mBluetoothGatt.disconnect();
+            BluetoothOn = false;
+
+        }
+    }
 
 
 }
