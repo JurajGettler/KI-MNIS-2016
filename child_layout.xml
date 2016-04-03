@@ -99,7 +99,7 @@
             android:textSize="13dp"
             android:layout_marginRight="20dp"
             android:textAlignment="center"
-            android:background="@drawable/blue_trening"
+            android:background="@drawable/tlacidlo"
             />
 
         <Button
@@ -110,7 +110,7 @@
             android:textSize="13dp"
             android:layout_marginRight="20dp"
             android:textAlignment="center"
-            android:background="@drawable/blue_trening"/>
+            android:background="@drawable/tlacidlo"/>
 
         <ImageView
             android:layout_width="60dp"

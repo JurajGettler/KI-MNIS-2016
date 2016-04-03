@@ -22,12 +22,14 @@ import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -36,6 +38,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -81,6 +84,10 @@ public class Trenuj extends AppCompatActivity{
             int t = Integer.parseInt(s);
             pocitadlo++;
             avg_tep = avg_tep + t;
+            if (t > max_tep ){
+                pretazeny = true;
+                vibrovat();
+            }else{ pretazeny = false;}
         }
     };
     int BR = 1;
@@ -123,6 +130,13 @@ public class Trenuj extends AppCompatActivity{
     String[] zozmam_sportov = {"BEH","CHODZA","CYKLISTIKA","KORCULOVANIE"};
     int [] image_sport = {R.drawable.beh,R.drawable.chodza,R.drawable.cyklistika,R.drawable.korculovanie};
 
+ //PRETAZENIE
+    private Vibrator vibrator;
+    private MediaPlayer alarm;
+    int max_tep = 0;
+    CheckBox zvuk,vibr;
+    boolean pretazeny = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +148,7 @@ public class Trenuj extends AppCompatActivity{
         Cursor user = myDb.getAllDataUSER();
         if (user.moveToFirst()) {
             int vaha = user.getInt(3);
-            int max_tep = user.getInt(4);
+            max_tep = user.getInt(4);
             int vek = user.getInt(1);
             pohlavie = user.getString(2);
             if (vaha < 30 || max_tep < 60 || vek < 5 ) {
@@ -160,7 +174,7 @@ public class Trenuj extends AppCompatActivity{
 
         dnes = Calendar.getInstance();
         format_hodiny = new SimpleDateFormat("HH:mm");
-        format_den = new SimpleDateFormat("dd.MM.yyyy");
+        format_den = new SimpleDateFormat("MM.dd.yyyy");
         skenuj = (Button) findViewById(R.id.skenuj);
         butnstart = (Button) findViewById(R.id.start);
         butnstop = (Button) findViewById(R.id.stop);
@@ -332,10 +346,8 @@ public class Trenuj extends AppCompatActivity{
            avg_tep = avg_tep/pocitadlo;
            if (pohlavie.equals("MUZSKE")) {
                kcal = kcalMuz();
-               Toast.makeText(Trenuj.this,"MUZ",Toast.LENGTH_LONG).show();
            }else {
                kcal = kcalZena();
-               Toast.makeText(Trenuj.this,"ZENA",Toast.LENGTH_LONG).show();
            }
            myDb.ubdateData(TRENING,datum, vzdialenost, cas, avg_tep, priemerna_rychlost, kcal, hodiny,vybraty_sport);
 
@@ -361,6 +373,11 @@ public class Trenuj extends AppCompatActivity{
             }
         });
 
+  //PRETAZENIE
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        zvuk = (CheckBox) findViewById(R.id.zvuk);
+        vibr = (CheckBox) findViewById(R.id.vibrovanie);
+        alarm = MediaPlayer.create(this,R.raw.alarm);
 
 
 
@@ -592,6 +609,13 @@ public class Trenuj extends AppCompatActivity{
             sHandler.sendMessage(msg);
 
 
+
+
+
+
+
+
+
         }
 
         @Override
@@ -696,6 +720,20 @@ public class Trenuj extends AppCompatActivity{
             BluetoothOn = false;
 
         }
+    }
+
+    private void vibrovat(){
+
+      // long[] ciklus = {250,500};
+       if((cas_rychlost%5) == 0) {
+           if (vibr.isChecked()) {
+               vibrator.vibrate(1000);
+           }
+           if (zvuk.isChecked()) {
+               alarm.start();
+           }
+       }
+
     }
 
 

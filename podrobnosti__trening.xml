@@ -12,14 +12,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="DATUM TRENINGU"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/DATUM_TRENINGU"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="DATUM TRENINGU"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -28,14 +30,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="VZDIALENOST"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/VZDIALENOST"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="VZDIALENOST"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -44,14 +48,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="DLZKA TRENINGU"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/DLZKA_TRENINGU"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="DLZKA_TRENINGU"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -60,14 +66,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="PREIEMERNY TEP"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/PRIEMERNY_TEP"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="PRIEMERNY_TEP"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -76,14 +84,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="PRIEMERNA RYCHLOST"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/PRIEMERNA_RYCHLOST"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="PRIEMERNA_RYCHLOST"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -92,14 +102,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="KCAL"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/KCAL"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="KCAL"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -108,14 +120,16 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="CAS TRENINGU"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/CAS_TRENINGU"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="CAS_TRENINGU"
         android:textSize="15sp"
         android:textStyle="bold"
@@ -125,11 +139,12 @@
     <Button
         android:id="@+id/ZMAZAT"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="60dp"
         android:text="ZMAZAT TRENING"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:onClick="ZMAZAT_TRENING"/>
+        android:onClick="ZMAZAT_TRENING"
+        android:background="@drawable/tlacidlo"/>
 
 
 

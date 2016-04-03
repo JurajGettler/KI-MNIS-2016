@@ -41,10 +41,10 @@ public class Nastavenia extends AppCompatActivity {
         max_tep_edit = (EditText) findViewById(R.id.user_max_tep_edit);
 
         if (res.moveToFirst()){
-            meno.setText("MENO : " + res.getString(1));
-            pohlavie.setText("POHLAVIE : " + res.getString(2));
-            vaha.setText("VAHA : " + res.getString(3) + " Kg");
-            max_tep.setText("MAX TEPOVA FREKVENCIA : " + res.getString(4));
+            meno.setText("VEK :                                               " + res.getString(1) + " rokov");
+            pohlavie.setText("POHLAVIE :                                   " + res.getString(2));
+            vaha.setText(   "VAHA :                                            " + res.getString(3) + " Kg");
+            max_tep.setText("MAX TEPOVA FREKVENCIA :    " + res.getString(4));
 
             meno_edit.setText(res.getString(1));
             vaha_edit.setText(res.getString(3));
